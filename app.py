@@ -1,30 +1,54 @@
-from flask import Flask, render_template, request, redirect, url_for
-from src.scraper import scrape  # Adjust import path if necessary
+import streamlit as st
+from src.scraper import scrape 
 
-app = Flask(__name__)
+USER_DATABASE = {
+    "admin": "password123"
+}
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
+def job_search_page():
+    st.title('Job Search')
 
-        print(request.form)
+    # Create form elements
+    job_name = st.text_input('Job Name')
+    min_salary = st.number_input('Minimum Salary', min_value=0, step=500)
+    max_salary = st.number_input('Maximum Salary', min_value=0, step=500)
+    employment_types = ['Permanent', 'Full Time', 'Part Time', 'Contract', 'Flexi-work', 'Temporary', 'Freelance', 'Internship/Attachment']
+    selected_employment_types = st.multiselect('Filter Employment Types', employment_types)
 
-        job_name = request.form.get('job_name')
-        min_s = int(request.form.get('min_s'))
-        max_s = int(request.form.get('max_s'))
-        filter_company = request.form.getlist('filter_company')  # Assuming input as a comma-separated list
-        filter_employment = request.form.getlist('filter_employment')  # Assuming input as a comma-separated list
+    # Submit button
+    if st.button('Search'):
+        st.write('Job Name:', job_name)
+        st.write('Minimum Salary:', min_salary)
+        st.write('Maximum Salary:', max_salary)
+        st.write('Selected Employment Types:', ', '.join(selected_employment_types))
+
+
+def verify_login(username, password):
+    """Check if the username and password match a user in the database."""
+    if username in USER_DATABASE and USER_DATABASE[username] == password:
+        return True
+    return False
+
+def login_page():
+    """The login page interface."""
+    st.title("Login Page")
+    
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
         
-        # Call the scrape function and pass the input parameters
-        scraped_data = scrape(job_name, min_s, max_s, filter_company, filter_employment)
-        
-        print(scraped_data) 
+        submitted = st.form_submit_button("Login")
+        if submitted:
+            if verify_login(username, password):
+                # Authentication success
+                st.session_state['authenticated'] = True
+            else:
+                st.error("Incorrect username or password.")
 
-        # Pass the results to the results template
-        return render_template('results.html', scraped_data=scraped_data)
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
 
-    # Show the form by default
-    return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if st.session_state['authenticated']:
+    job_search_page()
+else:
+    login_page()

@@ -2,7 +2,7 @@ from helium import *
 from bs4 import BeautifulSoup
 from selenium.common.exceptions import TimeoutException
 
-def scrape(job_name, min_s, max_s, filter_company, filter_employment):
+def scrape(job_name, min_s, max_s, filter_employment):
 
     data = []
     web_urls = job_name.split()
@@ -59,7 +59,7 @@ def scrape(job_name, min_s, max_s, filter_company, filter_employment):
                 if int(min_salary) < min_s or int(max_salary) > max_s:
                     continue
 
-                if filter(filter_company, company, filter_employment, employment) == False:
+                if filter(filter_employment, employment) == False:
                     continue
 
                 data.append({
@@ -67,17 +67,15 @@ def scrape(job_name, min_s, max_s, filter_company, filter_employment):
                     'Job':  f'{job}',
                     'Employment': f'{employment}',
                     'Salary': f'{salary}',
-                    'Link': f'https://www.mycareersfuture.gov.sg/{link}'
+                    'Link': f'https://www.mycareersfuture.gov.sg{link}'
                 })
 
     return data
 
-def filter(filter_company, company, filter_employment, employment):
-    for i in filter_company:
-        if i.lower() in company.lower():
-            return False
-    for i in filter_employment:
-        if i.lower() in employment.lower():
-            return False
+def filter(filter_employment, employment):
+    if filter_employment != ['']:
+        for i in filter_employment:
+            if i.lower() in employment.lower():
+                return False
         
     return True
