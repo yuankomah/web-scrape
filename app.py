@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from src.scraper import scrape 
 
 USER_DATABASE = {
@@ -9,18 +10,33 @@ def job_search_page():
     st.title('Job Search')
 
     # Create form elements
-    job_name = st.text_input('Job Name')
-    min_salary = st.number_input('Minimum Salary', min_value=0, step=500)
-    max_salary = st.number_input('Maximum Salary', min_value=0, step=500)
+    job_name = st.text_input('Job Name').strip()
+    min_salary = st.number_input('Minimum Salary', min_value=0, value=0, step=500)
+    max_salary = st.number_input('Maximum Salary', min_value=0, value=10000, step=500)
     employment_types = ['Permanent', 'Full Time', 'Part Time', 'Contract', 'Flexi-work', 'Temporary', 'Freelance', 'Internship/Attachment']
     selected_employment_types = st.multiselect('Filter Employment Types', employment_types)
 
     # Submit button
     if st.button('Search'):
-        st.write('Job Name:', job_name)
-        st.write('Minimum Salary:', min_salary)
-        st.write('Maximum Salary:', max_salary)
-        st.write('Selected Employment Types:', ', '.join(selected_employment_types))
+        if not job_name:
+            st.error('Please enter a job name to proceed.')
+        else:
+            st.write('Job Name:', job_name)
+            st.write('Minimum Salary:', min_salary)
+            st.write('Maximum Salary:', max_salary)
+            st.write('Selected Employment Types:', ', '.join(selected_employment_types))
+
+            with st.spinner('Extracting data... Please wait'):
+                scraped_data = scrape(job_name, min_salary, max_salary, selected_employment_types)
+            
+            csv = pd.DataFrame(scraped_data).to_csv(index=False)
+
+            st.download_button(
+                label="Download data as CSV",
+                data=csv,
+                file_name= f'{job_name}.csv',
+                mime='text/csv',
+            )
 
 
 def verify_login(username, password):
