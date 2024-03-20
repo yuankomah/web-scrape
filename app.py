@@ -3,14 +3,15 @@ import pandas as pd
 from src.scraper import scrape 
 
 USER_DATABASE = {
-    "admin": "password123"
+    "admin": "password123",
+    "admin2": "password123"
 }
 
 def job_search_page():
     st.title('Job Search')
 
     # Create form elements
-    job_name = st.text_input('Job Name').strip()
+    job_name = st.text_input('Job Name').strip().title()
     min_salary = st.number_input('Minimum Salary', min_value=0, value=0, step=500)
     max_salary = st.number_input('Maximum Salary', min_value=0, value=10000, step=500)
     employment_types = ['Permanent', 'Full Time', 'Part Time', 'Contract', 'Flexi-work', 'Temporary', 'Freelance', 'Internship/Attachment']
@@ -24,7 +25,11 @@ def job_search_page():
             st.write('Job Name:', job_name)
             st.write('Minimum Salary:', min_salary)
             st.write('Maximum Salary:', max_salary)
-            st.write('Selected Employment Types:', ', '.join(selected_employment_types))
+
+            if selected_employment_types == []:
+                st.write('Selected Employment Types: None')
+            else:
+                st.write('Selected Employment Types:', ', '.join(selected_employment_types))
 
             with st.spinner('Extracting data... Please wait'):
                 scraped_data = scrape(job_name, min_salary, max_salary, selected_employment_types)
@@ -40,7 +45,6 @@ def job_search_page():
 
 
 def verify_login(username, password):
-    """Check if the username and password match a user in the database."""
     if username in USER_DATABASE and USER_DATABASE[username] == password:
         return True
     return False
