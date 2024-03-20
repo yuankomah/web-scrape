@@ -2,3 +2,4 @@ pandas
 streamlit
 helium
 bs4
+selenium.common.exceptions

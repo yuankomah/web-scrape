@@ -2,11 +2,7 @@
 import streamlit as st
 import pandas as pd
 from src.scraper import scrape 
-
-USER_DATABASE = {
-    "admin": "password123",
-    "admin2": "password123"
-}
+from database.user import USER_DATABASE
 
 def job_search_page():
     st.title('Job Search')
