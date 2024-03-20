@@ -59,12 +59,7 @@ def scrape(job_name, min_s, max_s, filter_company, filter_employment):
                 if int(min_salary) < min_s or int(max_salary) > max_s:
                     continue
 
-                # Filter Company
-                if any(filter_company.lower() in company.lower() for filter_company in filter_company):
-                    continue
-
-                # Filter employment
-                if any(filter_employment.lower() in employment.lower() for filter_employment in filter_employment):
+                if filter(filter_company, company, filter_employment, employment) == False:
                     continue
 
                 data.append({
@@ -77,5 +72,12 @@ def scrape(job_name, min_s, max_s, filter_company, filter_employment):
 
     return data
 
-if __name__ == "__main__":
-    scrape()
+def filter(filter_company, company, filter_employment, employment):
+    for i in filter_company:
+        if i.lower() in company.lower():
+            return False
+    for i in filter_employment:
+        if i.lower() in employment.lower():
+            return False
+        
+    return True
