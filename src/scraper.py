@@ -67,12 +67,6 @@ def scrape(job_name, min_s, max_s, filter_company, filter_employment):
                 if any(filter_employment.lower() in employment.lower() for filter_employment in filter_employment):
                     continue
 
-                print(f"Company: {company}")
-                print(f"Job: {job}")
-                print(f"Employment: {employment}")
-                print(f"Salary: {salary}")
-                print(f"Link: https://www.mycareersfuture.gov.sg/{link}\n")
-                
                 data.append({
                     'Company': f'{company}',
                     'Job':  f'{job}',
