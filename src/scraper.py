@@ -1,7 +1,3 @@
-from helium import *
-from bs4 import BeautifulSoup
-from selenium.common.exceptions import TimeoutException
-
 def scrape(job_name, min_s, max_s, filter_employment):
 
     data = []

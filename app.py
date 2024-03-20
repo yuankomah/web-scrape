@@ -1,5 +1,3 @@
-import streamlit as st
-import pandas as pd
 from src.scraper import scrape 
 
 USER_DATABASE = {
