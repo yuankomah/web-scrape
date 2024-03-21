@@ -1,13 +1,35 @@
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-from helium import *
-from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
+import os
+import time
+import streamlit as st
+
+@st.cache_resource
+def get_driver():
+    return webdriver.Chrome(
+        service=Service(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+        ),
+        options=options,
+    )
+
+options = Options()
+options.add_argument("--disable-gpu")
+options.add_argument("--headless")
+
+driver = get_driver()
+driver.get("http://example.com")
+
+st.code(driver.page_source)
 
 def scrape(job_name, min_s, max_s, filter_employment):
-
     data = []
     web_urls = job_name.split()
-
     web = 'https://www.mycareersfuture.gov.sg/search?search='
 
     for index, word in enumerate(web_urls):
@@ -18,22 +40,17 @@ def scrape(job_name, min_s, max_s, filter_employment):
 
     web += '&sortBy=relevancy&page='
 
-    for i in range(10000):
+    for i in range(1000):
         url = web + str(i)
 
-        # Start a headless Chrome browser
-        browser = start_chrome(url, headless=True)
+        driver.get(url)
+        time.sleep(5)
 
-        try:
-            wait_until(Text(job_name).exists, timeout_secs=10)
-        except TimeoutException:
-            browser.quit()  
-            break 
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-        page_source = browser.page_source
-        browser.quit()
-
-        soup = BeautifulSoup(page_source, 'html.parser')
+        if not soup.find_all('div', {'id': 'job-card-0'}):
+            driver.quit()
+            break
 
         for j in range(100):
             job = soup.find_all('div', {'id': f'job-card-{j}'})
@@ -70,6 +87,8 @@ def scrape(job_name, min_s, max_s, filter_employment):
                     'Salary': f'{salary}',
                     'Link': f'https://www.mycareersfuture.gov.sg{link}'
                 })
+
+    driver.quit()
 
     return data
 
