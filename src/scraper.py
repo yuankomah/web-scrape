@@ -1,28 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 import os
 import time
-import streamlit as st
-
-@st.cache
-def get_driver():
-    options = webdriver.ChromeOptions()
-    # Add any options you need here
-
-    # Initialize the WebDriver
-    driver = webdriver.Chrome(
-        service=Service(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-        ),
-        options=options,
-    )
-
-    return driver
 
 def scrape(job_name, min_s, max_s, filter_employment):
     data = []
@@ -37,10 +16,11 @@ def scrape(job_name, min_s, max_s, filter_employment):
 
     web += '&sortBy=relevancy&page='
 
+    os.environ['PATH'] += r"C:/SeleniumDrivers"
+    driver = webdriver.Chrome()
+
     for i in range(1000):
         url = web + str(i)
-
-        driver = get_driver()
 
         driver.get(url)
         time.sleep(5)
