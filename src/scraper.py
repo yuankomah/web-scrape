@@ -9,23 +9,20 @@ import os
 import time
 import streamlit as st
 
-@st.cache_resource
+@st.cache
 def get_driver():
-    return webdriver.Chrome(
+    options = webdriver.ChromeOptions()
+    # Add any options you need here
+
+    # Initialize the WebDriver
+    driver = webdriver.Chrome(
         service=Service(
             ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
         ),
         options=options,
     )
 
-options = Options()
-options.add_argument("--disable-gpu")
-options.add_argument("--headless")
-
-driver = get_driver()
-driver.get("http://example.com")
-
-st.code(driver.page_source)
+    return driver
 
 def scrape(job_name, min_s, max_s, filter_employment):
     data = []
@@ -42,6 +39,8 @@ def scrape(job_name, min_s, max_s, filter_employment):
 
     for i in range(1000):
         url = web + str(i)
+
+        driver = get_driver()
 
         driver.get(url)
         time.sleep(5)

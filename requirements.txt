@@ -1,7 +1,7 @@
 pandas
 streamlit
 seleniumbase
-selenium==4.1.0
-webdriver-manager==3.5.2
-beautifulsoup4==4.10.0
-lxml==4.6.3
+selenium
+webdriver-manager
+bs4
+
